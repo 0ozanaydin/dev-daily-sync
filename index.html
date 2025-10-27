@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Daily Sync</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* CSS Reset ve Temel Ayarlar */
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --surface-hover: #2a2a2a;
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --text-color: #e0e0e0;
+            --text-muted: #888;
+            --border-color: #333;
+            --red-negative: #ff3b30;
+            --red-glow: 0 0 15px rgba(255, 59, 48, 0.8);
+            --green-positive: #34c759;
+            --font-family: 'Inter', sans-serif;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+        }
+
+        html, body {
+            height: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* ---------------------------------
+           LOGIN / REGISTER EKRANI
+        --------------------------------- */
+        #auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #232526, #414345);
+        }
+
+        .auth-box {
+            background-color: var(--surface-color);
+            padding: 32px 40px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .auth-box h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #fff;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-color);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.2);
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            width: 100%;
+        }
+        .btn:disabled {
+            background-color: var(--text-muted);
+            cursor: not-allowed;
+        }
+        
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        #auth-error {
+            color: var(--red-negative);
+            margin-top: 16px;
+            display: none;
+        }
+
+
+        /* ---------------------------------
+           ANA UYGULAMA EKRANI
+        --------------------------------- */
+        #app-container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+            display: none; /* Login olunca görünür yap */
+        }
+        
+        /* 1. Sol Menü (Sidebar) */
+        .sidebar {
+            background-color: var(--surface-color);
+            border-right: 1px solid var(--border-color);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar-header i {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-right: 12px;
+        }
+
+        .sidebar-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+        }
+        
+        .sidebar-menu { list-style: none; }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            font-weight: 500;
+        }
+        
+        .menu-item i {
+            margin-right: 16px;
+            width: 20px;
+            text-align: center;
+            color: var(--text-muted);
+            transition: color 0.3s;
+        }
+        
+        .menu-item:hover { background-color: var(--surface-hover); }
+        .menu-item.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 8px rgba(0,123,255,0.2);
+        }
+        .menu-item.active i { color: white; }
+
+        .sidebar-footer {
+            margin-top: auto;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+        .user-profile i {
+            font-size: 20px;
+            padding: 10px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+        .user-profile span {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        #logout-btn {
+            width: 100%;
+            margin-top: 16px;
+            background-color: var(--red-negative);
+            font-size: 14px;
+        }
+        #logout-btn:hover { background-color: #c00; }
+        
+        /* 2. Ana İçerik Alanı */
+        .main-content {
+            padding: 32px 40px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: fadeIn 0.5s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .main-content h2 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            color: #fff;
+        }
+        .main-content h2 i {
+            margin-right: 12px;
+            color: var(--primary-color);
+        }
+
+        /* Kart Yapısı */
+        .card {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        /* Form Elemanları */
+        .form-group { margin-bottom: 16px; }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        input[type="text"], input[type="date"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-color);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        input[type="text"]:focus, input[type="date"]:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.2);
+        }
+
+        /* ---------------------------------
+           DAILY SAYFASI
+        --------------------------------- */
+
+        /* Rich Text Editor */
+        .rich-text-editor {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--bg-color);
+        }
+        .editor-toolbar {
+            padding: 8px;
+            background-color: var(--surface-hover);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 8px 8px 0 0;
+        }
+        .editor-toolbar button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 8px;
+            margin-right: 4px;
+            border-radius: 4px;
+        }
+        .editor-toolbar button:hover {
+            background-color: var(--border-color);
+            color: var(--text-color);
+        }
+        
+        .editor-content {
+            min-height: 120px;
+            padding: 12px;
+            color: var(--text-color);
+            outline: none;
+        }
+        
+        /* "Çalışma Yapmadım" Butonu */
+        .negative-btn {
+            background: linear-gradient(145deg, var(--red-negative), #b00);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            animation: pulse-red 2s infinite ease-in-out;
+        }
+        
+        .negative-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--red-glow);
+        }
+        
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 8px rgba(255, 59, 48, 0.4); }
+            50% { box-shadow: var(--red-glow); }
+            100% { box-shadow: 0 0 8px rgba(255, 59, 48, 0.4); }
+        }
+        
+        /* Dosya Yükleme Alanı Stilleri */
+        .file-input {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--surface-hover);
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            color: var(--text-muted);
+        }
+        .file-input::file-selector-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.2s;
+        }
+        .file-input::file-selector-button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .file-preview-container {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .file-preview-item {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 12px;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .file-preview-item i {
+            color: var(--green-positive);
+        }
+
+
+        /* Daily Listesi */
+        .daily-group {
+            margin-bottom: 24px;
+        }
+        .daily-group-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 8px;
+        }
+        
+        .daily-item {
+            background-color: var(--surface-hover);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .daily-item.negative {
+            border-left-color: var(--red-negative);
+            animation: glow-negative-border 1.5s infinite alternate;
+        }
+        
+        @keyframes glow-negative-border {
+             from { box-shadow: 0 0 2px var(--red-negative); }
+             to { box-shadow: 0 0 10px var(--red-negative); }
+        }
+
+        .daily-header {
+            padding: 16px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .daily-header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .daily-header-meta {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .daily-header-meta .user {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        .daily-header-meta .hours {
+            margin-left: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .daily-item.negative .daily-header-title {
+            color: var(--red-negative);
+        }
+        .daily-item.negative .hours {
+            background-color: var(--red-negative);
+            animation: pulse-red 2s infinite;
+        }
+
+        .daily-content {
+            padding: 0 20px 20px 20px;
+            border-top: 1px solid var(--border-color);
+            
+            /* Kayarak açılma animasyonu için */
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            padding-top: 0;
+            padding-bottom: 0;
+            display: block;
+        }
+        
+        .daily-content p {
+            margin-bottom: 16px;
+        }
+        
+        .daily-screenshots {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .daily-screenshots img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            transition: transform 0.2s;
+        }
+        .daily-screenshots img:hover {
+            transform: scale(1.05);
+            border-color: var(--primary-color);
+        }
+        
+        /* ---------------------------------
+           TODO SAYFASI
+        --------------------------------- */
+        .todo-table-wrapper {
+            overflow-x: auto;
+        }
+        .todo-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .todo-table th, .todo-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .todo-table th {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background-color: var(--surface-hover);
+        }
+        
+        .todo-table tr:hover {
+            background-color: var(--surface-hover);
+        }
+        
+        .todo-table td {
+            font-size: 14px;
+        }
+        
+        .todo-table .task-name {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .todo-table .task-deadline b {
+            color: var(--red-negative);
+        }
+        
+        .todo-table .task-completed {
+            opacity: 0.4;
+        }
+        .todo-table .task-completed .task-name {
+            text-decoration: line-through;
+        }
+        
+        .task-actions .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 8px;
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+        .task-actions .action-btn.complete:hover { color: var(--green-positive); }
+        .task-actions .action-btn.images:hover { color: var(--primary-color); }
+        
+        /* ---------------------------------
+           DASHBOARD SAYFASI
+        --------------------------------- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        
+        /* ---------------------------------
+           MODAL (Popup) PENCERELER
+        --------------------------------- */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal-content {
+            background-color: var(--surface-color);
+            margin: auto;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .close-btn {
+            color: var(--text-muted);
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-btn:hover { color: #fff; }
+
+        /* Bildirim Modalı */
+        #notification-modal p {
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        
+        /* Negatif Daily Modalı */
+        #negative-modal textarea {
+            min-height: 100px;
+        }
+        
+        /* Slider Modalı */
+        #slider-modal .modal-content {
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+            max-width: 90vw;
+        }
+        #slider-image {
+            width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        .slider-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+        }
+        .slider-nav button {
+            background-color: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: white;
+            font-size: 32px;
+            cursor: pointer;
+            padding: 16px;
+            transition: background-color 0.2s;
+        }
+        .slider-nav button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="auth-container">
+        <div class="auth-box">
+            <form id="login-form">
+                <h2>Giriş Yap</h2>
+                <div class="input-group">
+                    <label for="username">Kullanıcı Adı</label>
+                    <input type="text" id="username" name="username" required value="ozan"> </div>
+                <div class="input-group">
+                    <label for="password">Şifre</label>
+                    <input type="password" id="password" name="password" required value="123"> </div>
+                <button type="submit" class="btn">Giriş Yap</button>
+                <p id="auth-error"></p>
+                <p style="color: var(--text-muted); font-size: 12px; margin-top: 16px;">
+                    Test Kullanıcıları: ozan (123) / taha (456)
+                </p>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="app-container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-sync-alt"></i>
+                <h3>Dev Sync</h3>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-target="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Ana Menü</span>
+                </li>
+                <li class="menu-item" data-target="daily">
+                    <i class="fas fa-calendar-day"></i>
+                    <span>Daily Kayıtları</span>
+                </li>
+                <li class="menu-item" data-target="todo">
+                    <i class="fas fa-check-square"></i>
+                    <span>Yapılacaklar (Todo)</span>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <i class="fas fa-user"></i>
+                    <span id="user-fullname">Kullanıcı Adı</span>
+                </div>
+                <button class="btn" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+                </button>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            
+            <section class="content-section active" id="dashboard">
+                <h2><i class="fas fa-home"></i> Ana Menü</h2>
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3><i class="fas fa-exclamation-triangle" style="color: var(--red-negative);"></i> Yaklaşan Görevler ( &lt; 1 Hafta)</h3>
+                        <div id="dashboard-todos">
+                            <p>Yaklaşan görev bulunmuyor.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-check-circle" style="color: var(--green-positive);"></i> Bugünkü Daily Kayıtları</h3>
+                        <div id="dashboard-dailies">
+                            <p>Bugün henüz kimse daily girmedi.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="content-section" id="daily">
+                <h2><i class="fas fa-calendar-day"></i> Günlük Kayıtlar (Daily)</h2>
+                
+                <div class="card">
+                    <h3>Yeni Daily Kaydı Ekle</h3>
+                    <form id="daily-form">
+                        <div class="form-group">
+                            <label for="daily-title">Başlık</label>
+                            <input type="text" id="daily-title" placeholder="Örn: Backend API tamamlandı." required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="daily-description">Açıklama</label>
+                            <div class="rich-text-editor">
+                                <div class="editor-toolbar">
+                                    <button type="button" class="editor-btn" data-command="bold"><i class="fas fa-bold"></i></button>
+                                    <button type="button" class="editor-btn" data-command="italic"><i class="fas fa-italic"></i></button>
+                                </div>
+                                <div id="daily-description" class="editor-content" contenteditable="true"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="daily-hours">Bugünkü Ortalama Çalışma Saati</label>
+                            <select id="daily-hours">
+                                <option value="0">Seçiniz...</option>
+                                <option value="1">1 Saat</option>
+                                <option value="2">2 Saat</option>
+                                <option value="3">3 Saat</option>
+                                <option value="4">4 Saat</option>
+                                <option value="5">5 Saat</option>
+                                <option value="6">6 Saat</option>
+                                <option value="7">7 Saat</option>
+                                <option value="8">8+ Saat</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="daily-ss-upload">Ekran Görüntüleri</label>
+                            
+                            <input type="file" id="daily-ss-upload" multiple accept="image/*" class="file-input">
+                            
+                            <div id="file-preview-list" class="file-preview-container">
+                                </div>
+                        </div>
+
+                        <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> Gönder</button>
+                        
+                        <button type="button" class="negative-btn" id="negative-daily-btn">
+                            <i class="fas fa-frown"></i> ÇALIŞMA YAPMADIM
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h3>Geçmiş Kayıtlar</h3>
+                    <div id="daily-log-list">
+                        </div>
+                </div>
+            </section>
+
+            <section class="content-section" id="todo">
+                <h2><i class="fas fa-check-square"></i> Yapılacaklar Listesi</h2>
+                
+                <div class="card">
+                    <h3>Yeni Görev Ekle</h3>
+                    <form id="todo-form">
+                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 16px;">
+                            <input type="text" id="todo-task" placeholder="Görev açıklaması..." required>
+                            <select id="todo-assign" required>
+                                <option value="">Kime?</option>
+                                <option value="Ozan Yılmaz">Ozan Yılmaz</option>
+                                <option value="Taha Demir">Taha Demir</option>
+                            </select>
+                            <input type="date" id="todo-deadline" required>
+                            <button type="submit" class="btn"><i class="fas fa-plus"></i> Ekle</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h3>Görevler</h3>
+                    <div class="todo-table-wrapper">
+                        <table class="todo-table">
+                            <thead>
+                                <tr>
+                                    <th>Durum</th>
+                                    <th>Görev</th>
+                                    <th>Atanan Kişi</th>
+                                    <th>Deadline</th>
+                                    <th>Kalan Süre</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="todo-list-body">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="notification-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-bell" style="color: var(--primary-color);"></i> Bildirimlere İzin Ver</h3>
+                <span class="close-btn" data-modal="notification-modal">&times;</span>
+            </div>
+            <p>Daily girmeyi unutmaman için sana hatırlatma bildirimleri göndermek istiyoruz. Lütfen bildirimlere izin ver.</p>
+            <button class="btn" id="enable-notifications-btn">Bildirimlere İzin Ver</button>
+        </div>
+    </div>
+    
+    <div id="negative-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-frown" style="color: var(--red-negative);"></i> Çalışmama Nedeni</h3>
+                <span class="close-btn" data-modal="negative-modal">&times;</span>
+            </div>
+            <form id="negative-daily-form">
+                <p>Bugün neden çalışmadığını kısaca açıkla.</p>
+                <div class="form-group">
+                    <textarea id="negative-reason" placeholder="Örn: Hastaydım, acil işim çıktı..." required></textarea>
+                </div>
+                <button type="submit" class="btn" style="background-color: var(--red-negative);">Gönder</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="slider-modal" class="modal">
+        <span class="close-btn" data-modal="slider-modal" style="position: absolute; top: 20px; right: 30px; font-size: 40px; color: white;">&times;</span>
+        <div class="modal-content">
+            <img src="" id="slider-image" alt="Screenshot">
+        </div>
+        <div class="slider-nav">
+            <button id="slider-prev">&lt;</button>
+            <button id="slider-next">&gt;</button>
+        </div>
+    </div>
+    
+
+    <script>
+        // Backend sunucu adresimiz (Python Flask'ın çalıştığı yer)
+        const API_URL = '';
+        
+        let CURRENT_USER = null;
+        let SLIDER_IMAGES = [];
+        let CURRENT_SLIDER_INDEX = 0;
+        
+        // --- SES DOSYASI ---
+        const angrySound = new Audio('angry.mp3'); // angry.mp3 aynı klasörde olmalı
+
+        // Sayfa yüklendiğinde çalışacak ana fonksiyon
+        document.addEventListener('DOMContentLoaded', () => {
+            const authContainer = document.getElementById('auth-container');
+            const appContainer = document.getElementById('app-container');
+            const loginForm = document.getElementById('login-form');
+            const authError = document.getElementById('auth-error');
+            const logoutBtn = document.getElementById('logout-btn');
+            
+            // --- 1. OTURUM KONTROLÜ (SESSION CHECK) ---
+            checkUserSession();
+            
+            // --- 2. GİRİŞ İŞLEMİ ---
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                const response = await apiCall('/login', 'POST', { username, password });
+                
+                if (response.user) {
+                    CURRENT_USER = response.user;
+                    authContainer.style.display = 'none';
+                    appContainer.style.display = 'grid';
+                    initializeApp(); // Uygulamayı başlat
+                } else {
+                    authError.textContent = response.error || 'Giriş başarısız.';
+                    authError.style.display = 'block';
+                }
+            });
+            
+            // --- 3. ÇIKIŞ İŞLEMİ ---
+            logoutBtn.addEventListener('click', async () => {
+                await apiCall('/logout', 'POST');
+                CURRENT_USER = null;
+                authContainer.style.display = 'flex';
+                appContainer.style.display = 'none';
+            });
+
+        });
+
+        // --- UYGULAMAYI BAŞLATAN FONKSİYON (GİRİŞ SONRASI) ---
+        async function initializeApp() {
+            document.getElementById('user-fullname').textContent = CURRENT_USER.full_name;
+            setupNavigation();
+            setupRichTextEditor();
+            setupForms();
+            setupModals();
+            setupFileInputs(); // Dosya yükleme önizlemesi için
+            loadDashboard();
+            setTimeout(askForNotifications, 2000);
+        }
+        
+        // --- TEKRAR KULLANILABİLİR API ÇAĞRISI FONKSİYONU ---
+        async function apiCall(endpoint, method = 'GET', body = null) {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include' // Session çerezlerini göndermek için ÇOK ÖNEMLİ
+            };
+            
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+            
+            try {
+                const response = await fetch(API_URL + endpoint, options);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('API Call Error:', error);
+                return { error: error.message };
+            }
+        }
+        
+        // --- GİRİŞTE OTURUM KONTROLÜ ---
+        async function checkUserSession() {
+            const data = await apiCall('/check_session');
+            if (data.is_logged_in) {
+                CURRENT_USER = data.user;
+                document.getElementById('auth-container').style.display = 'none';
+                document.getElementById('app-container').style.display = 'grid';
+                initializeApp();
+            } else {
+                document.getElementById('auth-container').style.display = 'flex';
+                document.getElementById('app-container').style.display = 'none';
+            }
+        }
+        
+        // --- MENÜ NAVİGASYONU ---
+        function setupNavigation() {
+            const menuItems = document.querySelectorAll('.menu-item');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const targetId = item.getAttribute('data-target');
+
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+
+                    contentSections.forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    document.getElementById(targetId).classList.add('active');
+                    
+                    if (targetId === 'dashboard') loadDashboard();
+                    if (targetId === 'daily') loadDailies();
+                    if (targetId === 'todo') loadTodos();
+                });
+            });
+        }
+        
+        // --- SAYFA VERİLERİNİ YÜKLEME ---
+        
+        async function loadDashboard() {
+            const data = await apiCall('/api/dashboard');
+            
+            const todoContainer = document.getElementById('dashboard-todos');
+            if (data.upcoming_todos && data.upcoming_todos.length > 0) {
+                todoContainer.innerHTML = data.upcoming_todos.map(todo => `
+                    <div style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <strong>${todo.task}</strong> (Atanan: ${todo.assigned_to})
+                        <span style="float: right; color: var(--red-negative);">${todo.days_left_text}</span>
+                    </div>
+                `).join('');
+            } else {
+                todoContainer.innerHTML = '<p style="color: var(--text-muted);">Yaklaşan görev bulunmuyor.</p>';
+            }
+            
+            const dailyContainer = document.getElementById('dashboard-dailies');
+            if (data.todays_dailies && data.todays_dailies.length > 0) {
+                dailyContainer.innerHTML = data.todays_dailies.map(daily => `
+                    <div style="padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <strong>${daily.title}</strong> (Yazan: ${daily.user_name})
+                        ${daily.is_negative ? '<span style="color: var(--red-negative); margin-left: 8px;">(Çalışmadı)</span>' : ''}
+                    </div>
+                `).join('');
+            } else {
+                dailyContainer.innerHTML = '<p style="color: var(--text-muted);">Bugün henüz kimse daily girmedi.</p>';
+            }
+        }
+        
+        async function loadDailies() {
+            const groupedDailies = await apiCall('/api/dailies');
+            const listContainer = document.getElementById('daily-log-list');
+            
+            if (!groupedDailies || Object.keys(groupedDailies).length === 0) {
+                listContainer.innerHTML = '<p style="color: var(--text-muted);">Henüz hiç daily kaydı yok.</p>';
+                return;
+            }
+            
+            let html = '';
+            for (const dayKey in groupedDailies) {
+                html += `<h4 class="daily-group-title">${dayKey}</h4>`;
+                
+                const dailiesOnDay = groupedDailies[dayKey];
+                html += dailiesOnDay.map(daily => `
+                    <div class="daily-item ${daily.is_negative ? 'negative' : ''}">
+                        <div class="daily-header" data-daily-id="${daily.id}">
+                            <div>
+                                <span class="daily-header-title">${daily.title}</span>
+                            </div>
+                            <span class="daily-header-meta">
+                                <span class="user">${daily.user_name}</span>
+                                <span class="hours">
+                                    <i class="fas fa-clock"></i> ${daily.hours_worked} Saat
+                                </span>
+                            </span>
+                        </div>
+                        <div class="daily-content" id="content-${daily.id}">
+                            <p>${daily.is_negative ? `<b>Neden:</b> ${daily.negative_reason}` : daily.description}</p>
+                            ${daily.screenshots && daily.screenshots.length > 0 ? `
+                                <div class="daily-screenshots">
+                                    ${daily.screenshots.map(ss => `
+                                        <img src="${ss}" alt="Screenshot" class="daily-ss-thumb">
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+            listContainer.innerHTML = html;
+            setupDailyClickEvents();
+        }
+
+        function setupDailyClickEvents() {
+            document.querySelectorAll('.daily-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const dailyId = header.getAttribute('data-daily-id');
+                    const content = document.getElementById(`content-${dailyId}`);
+                    
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        content.style.paddingTop = '0px';
+                        content.style.paddingBottom = '0px';
+                    } else {
+                        content.style.display = 'block'; 
+                        content.style.maxHeight = content.scrollHeight + 40 + "px";
+                        content.style.paddingTop = '20px';
+                        content.style.paddingBottom = '20px';
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.daily-ss-thumb').forEach(thumb => {
+                thumb.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const screenshotsContainer = e.target.closest('.daily-screenshots');
+                    SLIDER_IMAGES = Array.from(screenshotsContainer.querySelectorAll('img')).map(img => img.src);
+                    CURRENT_SLIDER_INDEX = SLIDER_IMAGES.indexOf(e.target.src);
+                    openSliderModal();
+                });
+            });
+        }
+        
+        async function loadTodos() {
+            const todos = await apiCall('/api/todos');
+            const listBody = document.getElementById('todo-list-body');
+            
+            if (!todos || todos.length === 0) {
+                listBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Görev bulunmuyor.</td></tr>';
+                return;
+            }
+            
+            listBody.innerHTML = todos.map(todo => `
+                <tr class="${todo.is_completed ? 'task-completed' : ''}">
+                    <td>
+                        <input type="checkbox" class="todo-complete-check" data-id="${todo.id}" ${todo.is_completed ? 'checked' : ''}>
+                    </td>
+                    <td class="task-name">${todo.task}</td>
+                    <td>${todo.assigned_to}</td>
+                    <td>${todo.deadline}</td>
+                    <td class="task-deadline">${todo.days_left_text}</td>
+                    <td class="task-actions">
+                        <button class="action-btn images" title="Görselleri Göster (Yapım Aşamasında)">
+                            <i class="fas fa-image"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            document.querySelectorAll('.todo-complete-check').forEach(check => {
+                check.addEventListener('click', async (e) => {
+                    const todoId = e.target.getAttribute('data-id');
+                    await apiCall(`/api/todos/${todoId}/complete`, 'POST');
+                    loadTodos(); // Listeyi yenile
+                });
+            });
+        }
+        
+        // --- FORM GÖNDERME OLAYLARI ---
+        function setupForms() {
+            const dailyForm = document.getElementById('daily-form');
+            const negativeDailyForm = document.getElementById('negative-daily-form');
+            const todoForm = document.getElementById('todo-form');
+            
+            // Normal Daily Gönderme (GÖRSEL YÜKLEME DESTEKLİ)
+            dailyForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const submitButton = dailyForm.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.innerHTML;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yükleniyor...';
+                submitButton.disabled = true;
+
+                // 1. ADIM: Seçilen dosyaları al
+                const fileInput = document.getElementById('daily-ss-upload');
+                const files = fileInput.files;
+                
+                // 2. ADIM: Dosyaları paralel olarak yükle
+                const uploadPromises = Array.from(files).map(file => {
+                    const formData = new FormData();
+                    formData.append('image', file);
+                    
+                    return fetch(API_URL + '/api/upload_image', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'include'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.url) {
+                            return data.url;
+                        } else {
+                            throw new Error(data.error || 'Dosya yüklenemedi');
+                        }
+                    });
+                });
+                
+                let uploadedImageUrls = [];
+                try {
+                    uploadedImageUrls = await Promise.all(uploadPromises);
+                } catch (error) {
+                    console.error('Dosya yükleme hatası:', error);
+                    alert('Bir veya daha fazla dosya yüklenirken hata oluştu: ' + error.message);
+                    submitButton.innerHTML = originalButtonText;
+                    submitButton.disabled = false;
+                    return;
+                }
+                
+                // 3. ADIM: Daily'yi oluştur
+                const dailyData = {
+                    title: document.getElementById('daily-title').value,
+                    description: document.getElementById('daily-description').innerHTML,
+                    hours_worked: parseInt(document.getElementById('daily-hours').value),
+                    screenshots: uploadedImageUrls,
+                    is_negative: false
+                };
+
+                // 4. ADIM: Daily'yi kaydet
+                const result = await apiCall('/api/dailies', 'POST', dailyData);
+                
+                if (result.id) {
+                    dailyForm.reset();
+                    document.getElementById('daily-description').innerHTML = '';
+                    document.getElementById('file-preview-list').innerHTML = '';
+                    loadDailies();
+                    document.querySelector('.menu-item[data-target="daily"]').click();
+                } else {
+                    alert('Daily kaydedilirken hata oluştu: ' + result.error);
+                }
+                
+                submitButton.innerHTML = originalButtonText;
+                submitButton.disabled = false;
+            });
+            
+            // "Çalışmadım" Butonu Tıklaması
+            document.getElementById('negative-daily-btn').addEventListener('click', () => {
+                angrySound.play().catch(e => console.warn("Ses dosyası oynatılamadı. Kullanıcı etkileşimi gerekiyor."));
+                openModal('negative-modal');
+            });
+
+            // Negatif Daily Gönderme
+            negativeDailyForm.addEventListener('submit', async (e) => {
+                 e.preventDefault();
+                 const dailyData = {
+                    title: "Çalışma Yapılmadı",
+                    description: "",
+                    hours_worked: 0,
+                    screenshots: [],
+                    is_negative: true,
+                    negative_reason: document.getElementById('negative-reason').value
+                 };
+                 const result = await apiCall('/api/dailies', 'POST', dailyData);
+                 if (result.id) {
+                    negativeDailyForm.reset();
+                    closeModal('negative-modal');
+                    loadDailies();
+                    document.querySelector('.menu-item[data-target="daily"]').click();
+                 } else {
+                    alert('Hata oluştu: ' + result.error);
+                 }
+            });
+            
+            // Todo Ekleme
+            todoForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const todoData = {
+                    task: document.getElementById('todo-task').value,
+                    assigned_to: document.getElementById('todo-assign').value,
+                    deadline: document.getElementById('todo-deadline').value,
+                    images: []
+                };
+                const result = await apiCall('/api/todos', 'POST', todoData);
+                if (result.id) {
+                    todoForm.reset();
+                    loadTodos();
+                } else {
+                    alert('Hata oluştu: ' + result.error);
+                }
+            });
+        }
+        
+        // --- DOSYA YÜKLEME ÖNİZLEMESİ ---
+        function setupFileInputs() {
+            const fileInput = document.getElementById('daily-ss-upload');
+            const previewContainer = document.getElementById('file-preview-list');
+            
+            if (fileInput) {
+                fileInput.addEventListener('change', () => {
+                    previewContainer.innerHTML = '';
+                    const files = fileInput.files;
+                    if (files.length === 0) return;
+                    
+                    Array.from(files).forEach(file => {
+                        const previewItem = document.createElement('div');
+                        previewItem.classList.add('file-preview-item');
+                        previewItem.innerHTML = `
+                            <i class="fas fa-check-circle"></i>
+                            <span>${file.name} (${(file.size / 1024).toFixed(1)} KB)</span>
+                        `;
+                        previewContainer.appendChild(previewItem);
+                    });
+                });
+            }
+        }
+        
+        // --- RICH TEXT EDITOR ---
+        function setupRichTextEditor() {
+            document.querySelectorAll('.editor-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const command = btn.getAttribute('data-command');
+                    document.execCommand(command, false, null);
+                });
+            });
+        }
+        
+        // --- MODAL (POPUP) PENCERE YÖNETİMİ ---
+        function setupModals() {
+            document.querySelectorAll('.close-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    closeModal(btn.getAttribute('data-modal'));
+                });
+            });
+            
+            window.addEventListener('click', (event) => {
+                if (event.target.classList.contains('modal')) {
+                    closeModal(event.target.id);
+                }
+            });
+            
+            document.getElementById('slider-prev').addEventListener('click', () => changeSlide(-1));
+            document.getElementById('slider-next').addEventListener('click', () => changeSlide(1));
+        }
+        
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        function openSliderModal() {
+            document.getElementById('slider-image').src = SLIDER_IMAGES[CURRENT_SLIDER_INDEX];
+            openModal('slider-modal');
+        }
+        
+        function changeSlide(direction) {
+            CURRENT_SLIDER_INDEX += direction;
+            if (CURRENT_SLIDER_INDEX < 0) {
+                CURRENT_SLIDER_INDEX = SLIDER_IMAGES.length - 1;
+            } else if (CURRENT_SLIDER_INDEX >= SLIDER_IMAGES.length) {
+                CURRENT_SLIDER_INDEX = 0;
+            }
+            document.getElementById('slider-image').src = SLIDER_IMAGES[CURRENT_SLIDER_INDEX];
+        }
+
+        // --- BİLDİRİM İZNİ ---
+        function askForNotifications() {
+            if (!("Notification" in window) || Notification.permission === "granted") {
+                return;
+            }
+            
+            if (Notification.permission !== "denied") {
+                openModal('notification-modal');
+                
+                document.getElementById('enable-notifications-btn').onclick = () => {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            new Notification("Harika!", { body: "Bildirimlere izin verdin. Artık hatırlatmaları alabilirsin." });
+                        }
+                        closeModal('notification-modal');
+                    });
+                };
+            }
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+Flask
+Flask-CORS
+cloudinary
+python-dotenv
+gunicorn
+plyer
+schedule
